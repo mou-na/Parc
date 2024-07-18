@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Vehicle;
 use App\Repository\ResponsabledeflotteRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -26,5 +27,14 @@ class ResponsabledeflotteController extends AbstractController
             'vehicle' => $vehicle,
             'history' => $history,
         ]);
+    }
+
+    #[Route('/vehicule/{id}/budget', name: 'vehicule_budget')]
+    public function gererBudgetVehicule(Request $request, Vehicle $vehicle): Response
+    {
+        $expense = (float)$request->request->get('expense');
+        $this->responsabledeflotterepository->gererBudgetVehicule($vehicle, $expense);
+
+        return $this->redirectToRoute('vehicule_show', ['id' => $vehicle->getId()]);
     }
 }

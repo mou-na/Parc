@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Vehicle;
+use App\Repository\VehicleRepository;
+use Psr\Log\LoggerInterface;
 use App\Entity\Responsabledeflotte;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -12,16 +14,20 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ResponsabledeflotteRepository extends ServiceEntityRepository
 {
+    private $vehicleRepository;
+    private $logger;
 
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, VehicleRepository $vehicleRepository, LoggerInterface $logger)
     {
+        $this->vehicleRepository = $vehicleRepository;
+        $this->logger = $logger;
         parent::__construct($registry, Responsabledeflotte::class);
     }
 
     public function suivreHistoriqueVehicule(Vehicle $vehicle): array
     {
         // Example logic to retrieve vehicle history
-        $vehicleHistoryRepository = $this->entityManager->getRepository('App:VehicleHistory');
+        $vehicleHistoryRepository = $this->entityManager->getRepository('App:Historique');
         $history = $vehicleHistoryRepository->findBy(['vehicle' => $vehicle], ['date' => 'DESC']);
 
         // Log the retrieval of history
@@ -33,9 +39,18 @@ class ResponsabledeflotteRepository extends ServiceEntityRepository
         return $history;
     }
 
-    public function gererBudgetVehicule(): void
+    public function gererBudgetVehicule(Vehicle $vehicle, float $expense): void
     {
-        // Logique pour gérer le budget du véhicule
+        // Assuming the Vehicle entity has budget-related fields
+        $budget = $vehicle->getBudget();
+        $currentDepenses = $budget->getDepenses();
+        $budget->setDepenses($currentDepenses + $expense);
+
+        // Log the expense
+        $this->logger->info("Expense of $expense applied to vehicle with ID {$vehicle->getId()}.");
+
+        // Persist changes to the database
+        $this->vehicleRepository->save($vehicle);
     }
 
 
