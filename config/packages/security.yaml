@@ -2,9 +2,11 @@ security:
   # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
   password_hashers:
     Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: "auto"
+
   # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
   providers:
     users_in_memory: { memory: null }
+
   firewalls:
     dev:
       pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -33,10 +35,10 @@ security:
     - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
     - { path: ^/, roles: ROLE_RESPONSABLE_FLOTTE }
 
-   role_hierarchy:
-      ROLE_RESPONSABLE_FLOTTE: [ROLE_USER]
-      ROLE_DIRECTEUR_COMMERCIAL: [ROLE_USER]
-      ROLE_DIRECTEUR: [ROLE_USER]
+  role_hierarchy:
+    ROLE_RESPONSABLE_FLOTTE: [ROLE_USER]
+    ROLE_DIRECTEUR_COMMERCIAL: [ROLE_USER]
+    ROLE_DIRECTEUR: [ROLE_USER]
 when@test:
   security:
     password_hashers:

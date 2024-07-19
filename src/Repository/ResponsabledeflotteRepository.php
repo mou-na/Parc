@@ -2,8 +2,8 @@
 
 namespace App\Repository;
 
-use App\Entity\Vehicle;
-use App\Repository\VehicleRepository;
+use App\Entity\Vehicule;
+use App\Repository\VehiculeRepository;
 use Psr\Log\LoggerInterface;
 use App\Entity\Responsabledeflotte;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -17,14 +17,14 @@ class ResponsabledeflotteRepository extends ServiceEntityRepository
     private $vehicleRepository;
     private $logger;
 
-    public function __construct(ManagerRegistry $registry, VehicleRepository $vehicleRepository, LoggerInterface $logger)
+    public function __construct(ManagerRegistry $registry, VehiculeRepository $vehicleRepository, LoggerInterface $logger)
     {
         $this->vehicleRepository = $vehicleRepository;
         $this->logger = $logger;
         parent::__construct($registry, Responsabledeflotte::class);
     }
 
-    public function suivreHistoriqueVehicule(Vehicle $vehicle): array
+    public function suivreHistoriqueVehicule(Vehicule $vehicle): array
     {
         // Example logic to retrieve vehicle history
         $vehicleHistoryRepository = $this->entityManager->getRepository('App:Historique');
@@ -39,18 +39,24 @@ class ResponsabledeflotteRepository extends ServiceEntityRepository
         return $history;
     }
 
-    public function gererBudgetVehicule(Vehicle $vehicle, float $expense): void
+    public function gererBudgetVehicule(Vehicule $vehicle, float $expense): void
     {
-        // Assuming the Vehicle entity has budget-related fields
-        $budget = $vehicle->getBudget();
-        $currentDepenses = $budget->getDepenses();
-        $budget->setDepenses($currentDepenses + $expense);
+        // Assuming the Vehicle entity has a method to get the associated Budget entity
+        $budget = $vehicle->getIdBudget();
 
-        // Log the expense
-        $this->logger->info("Expense of $expense applied to vehicle with ID {$vehicle->getId()}.");
+        if ($budget !== null) {
+            $currentDepenses = $budget->getDepenses();
+            $budget->setDepenses($currentDepenses + $expense);
 
-        // Persist changes to the database
-        $this->vehicleRepository->save($vehicle);
+            // Log the expense
+            $this->logger->info("Expense of $expense applied to vehicle with ID {$vehicle->getId()}.");
+
+            // Persist changes to the database
+            $this->vehicleRepository->save($vehicle);
+        } else {
+            // Handle the case where the vehicle does not have an associated budget
+            $this->logger->warning("No budget found for vehicle with ID {$vehicle->getId()}.");
+        }
     }
 
 

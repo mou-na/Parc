@@ -2,7 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Vehicle;
+use App\Entity\Vehicule;
+use App\Entity\Responsabledeflotte;
 use App\Repository\ResponsabledeflotteRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,8 +20,13 @@ class ResponsabledeflotteController extends AbstractController
     }
 
     #[Route('/vehicule/{id}/historique', name: 'vehicule_historique')]
-    public function suivreHistoriqueVehicule(Vehicle $vehicle): Response
+    public function suivreHistoriqueVehicule(Vehicule $vehicle): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof Responsabledeflotte) {
+            throw $this->createAccessDeniedException('Access denied.');
+        }
+
         $history = $this->responsabledeflotterepository->suivreHistoriqueVehicule($vehicle);
 
         return $this->render('vehicule/historique.html.twig', [
@@ -30,8 +36,13 @@ class ResponsabledeflotteController extends AbstractController
     }
 
     #[Route('/vehicule/{id}/budget', name: 'vehicule_budget')]
-    public function gererBudgetVehicule(Request $request, Vehicle $vehicle): Response
+    public function gererBudgetVehicule(Request $request, Vehicule $vehicle): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof Responsabledeflotte) {
+            throw $this->createAccessDeniedException('Access denied.');
+        }
+
         $expense = (float)$request->request->get('expense');
         $this->responsabledeflotterepository->gererBudgetVehicule($vehicle, $expense);
 

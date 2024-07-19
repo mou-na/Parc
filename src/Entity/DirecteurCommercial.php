@@ -28,19 +28,4 @@ class DirecteurCommercial extends Utilisateur
 
         return $this;
     }
-
-    public function genererRapportsAnalyses(): void
-    {
-        // Logique pour générer des rapports et analyses
-    }
-
-    public function superviserVehicules(): void
-    {
-        // Logique pour superviser les véhicules
-    }
-
-    public function controlerEfficaciteGestion(): void
-    {
-        // Logique pour contrôler l'efficacité de la gestion
-    }
 }
