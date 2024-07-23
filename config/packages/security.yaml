@@ -14,12 +14,12 @@ security:
     main:
       lazy: true
       provider: users_in_memory
-      form_login:
-        login_path: app_login
-        check_path: app_login
-      logout:
-        path: app_logout
-        target: # Replace with your homepage route
+      #form_login:
+      #login_path: /login
+      #check_path: /login
+      #logout:
+      #path: logout
+      #target: # Replace with your homepage route
 
       # activate different ways to authenticate
       # https://symfony.com/doc/current/security.html#the-firewall
@@ -29,16 +29,22 @@ security:
 
   # Easy way to control access for large sections of your site
   # Note: Only the *first* access control that matches will be used
-  access_control:
-    # - { path: ^/admin, roles: ROLE_ADMIN }
-    # - { path: ^/profile, roles: ROLE_USER }
-    - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-    - { path: ^/, roles: ROLE_RESPONSABLE_FLOTTE }
 
   role_hierarchy:
     ROLE_RESPONSABLE_FLOTTE: [ROLE_USER]
     ROLE_DIRECTEUR_COMMERCIAL: [ROLE_USER]
     ROLE_DIRECTEUR: [ROLE_USER]
+
+  access_control:
+    # Allow everyone to access the login page
+    #- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+
+    # Allow users with ROLE_RESPONSABLE_FLOTTE or ROLE_DIRECTEUR to access all paths
+    #- { path: ^/, roles: [ROLE_RESPONSABLE_FLOTTE, ROLE_DIRECTEUR] }
+
+    # Allow users with ROLE_DIRECTEUR_COMMERCIAL to access only certain paths
+    #- { path: ^/restricted-path, roles: ROLE_DIRECTEUR_COMMERCIAL } # Replace /restricted-path with actual paths
+
 when@test:
   security:
     password_hashers:

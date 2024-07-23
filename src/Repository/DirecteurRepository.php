@@ -31,17 +31,28 @@ class DirecteurRepository extends ServiceEntityRepository
         return $this->vehicules;
     }
 
-    public function genererRapportsAnalyses(): void
+    public function genererRapportsAnalyses(): array
     {
         // Initialize an empty array to hold report data
         $rapports = [];
 
-        // Loop through each vehicle managed by the directeur
-        foreach ($this->vehicules as $vehicule) {
+        // Loop through each vehicle managed by the directeur commercial
+        foreach ($this->Vehicules as $vehicule) {
             // Fetch data related to the vehicle
             $assurance = $vehicule->getAssurance();
             $carburant = $vehicule->getCarburant();
             $budget = $vehicule->getBudget();
+            $entretients = $vehicule->getEntretient();
+
+            $entretientData = [];
+            foreach ($entretients as $entretient) {
+                $entretientData[] = [
+                    'id' => $entretient->getId(),
+                    'date' => $entretient->getDate()->format('Y-m-d'),
+                    'type' => $entretient->getType(),
+                    'prix' => $entretient->getPrix(),
+                ];
+            }
 
             // Analyze data and prepare a summary
             $rapports[] = [
@@ -63,7 +74,7 @@ class DirecteurRepository extends ServiceEntityRepository
                 'kilometrage' => $vehicule->getKilometrage(),
                 'type' => $vehicule->getType(),
                 'dimensionRoue' => $vehicule->getDimensionRoue(),
-                'entretient' => $vehicule->getEntretient(),
+                'entretient' => $entretientData,
                 'dateDerniereVidange' => $vehicule->getDateDerniereVidange(),
                 'cartePeage' => $vehicule->getCartePeage(),
                 'assurance' => [
@@ -71,6 +82,7 @@ class DirecteurRepository extends ServiceEntityRepository
                     'type' => $assurance->getType(),
                     'agence' => $assurance->getAgence(),
                     'date' => $assurance->getDate(),
+                    'prix' => $assurance->getPrix(),
                 ],
                 'budget' => [
                     'montantAlloue' => $budget->getMontantAlloue(),
@@ -82,14 +94,14 @@ class DirecteurRepository extends ServiceEntityRepository
         // Log the generated report data
         $this->logger->info('Generated vehicle reports', ['rapports' => $rapports]);
 
-        // Alternatively, you can save the report data to a file or a database
-        // Example: saveReportToFile($reportData);
+        // Return the generated report data
+        return $rapports;
     }
 
     public function controlerEfficaciteGestion(): void
     {
         // Fetch all vehicles
-        $vehicules = $this->vehiculeRepository->findAll();
+        $vehicules = $this->getVehicules();
 
         // Initialize variables to track totals
         $totalCarcurantCost = 0;
