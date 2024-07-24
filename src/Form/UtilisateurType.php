@@ -27,7 +27,7 @@ class UtilisateurType extends AbstractType
             ->add('motDePasse', PasswordType::class, [
                 'label' => 'Mot de passe'
             ])
-            ->add('telephone', TextType::class, [
+            ->add('tel', TextType::class, [
                 'label' => 'Téléphone'
             ])
             ->add('CIN', TextType::class, [

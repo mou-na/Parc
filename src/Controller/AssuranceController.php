@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class AssuranceController extends AbstractController
 {
@@ -19,37 +19,54 @@ class AssuranceController extends AbstractController
     }
 
     /**
-     * @Route("/assurance/{id}", name="assurance_show", methods={"GET"})
+     * @Route("/assurance/show", name="assurance_show", methods={"GET"})
      */
-    public function show(Assurance $assurance): Response
+    public function show(): Response
     {
-        return $this->json($assurance);
+        return $this->render('assurance/index.html.twig', [
+            'controller_name' => 'assuranceController',
+        ]);
     }
 
     /**
-     * @Route("/assurance", name="assurance_create", methods={"POST"})
+     * @Route("/assurance/create", name="assurance_create", methods={"POST"})
      */
     public function create(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
 
+        $numero = (string) $data['Numero'];
+        $type = (string) $data['Type'];
+        $agence = (string) $data['Agence'];
+        $date = \DateTime::createFromFormat('Y-m-d', $data['Date']);
+        if (!$date) {
+            return $this->json([
+                'error' => 'Invalid date format',
+                'message' => 'Date must be in YYYY-MM-DD format.'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+        $archive = (bool) $data['archive'];
+        $prix = (float) $data['prix'];
+
         $assurance = new Assurance();
-        $assurance->setNumero($data['Numero'] ?? null);
-        $assurance->setType($data['Type'] ?? null);
-        $assurance->setAgence($data['Agence'] ?? null);
-        $assurance->setDate($data['Date'] ?? null);
-        $assurance->setArchive($data['archive'] ?? null);
-        $assurance->setPrix($data['prix'] ?? null);
+        $assurance->setNumero($numero);
+        $assurance->setType($type);
+        $assurance->setAgence($agence);
+        $assurance->setDate($date);
+        $assurance->setArchive($archive);
+        $assurance->setPrix($prix);
 
         $entityManager = $this->entityManager;
         $entityManager->persist($assurance);
         $entityManager->flush();
 
-        return $this->json($assurance);
+        return $this->render('assurance/create.html.twig', [
+            'controller_name' => 'assuranceController',
+        ]);
     }
 
     /**
-     * @Route("/assurance/{id}", name="assurance_update", methods={"PUT"})
+     * @Route("/assurance/update", name="assurance_update", methods={"PUT"})
      */
     public function update(Request $request, Assurance $assurance): Response
     {
@@ -65,7 +82,9 @@ class AssuranceController extends AbstractController
         $entityManager = $this->entityManager;
         $entityManager->flush();
 
-        return $this->json($assurance);
+        return $this->render('assurance/update.html.twig', [
+            'controller_name' => 'assuranceController',
+        ]);
     }
 
     /**

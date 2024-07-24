@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Psr\Log\LoggerInterface;
 
-class DirecteurComercialController extends AbstractController
+class DirecteurCommercialController extends AbstractController
 {
     private $vehiculeRepository;
     private $directeurCommercialRepository;
@@ -41,6 +41,7 @@ class DirecteurComercialController extends AbstractController
 
         return $this->render('directeur_commercial/vehicules.html.twig', [
             'vehicules' => $vehicules,
+            'controller_name' => 'DirecteurCommercialController',
         ]);
     }
 
@@ -66,6 +67,7 @@ class DirecteurComercialController extends AbstractController
         // Render the view with report data
         return $this->render('directeur_commercial/rapport.html.twig', [
             'rapports' => $rapports,
+            'controller_name' => 'DirecteurCommercialController',
         ]);
     }
 
@@ -87,6 +89,8 @@ class DirecteurComercialController extends AbstractController
         ]);
 
         // Render the view
-        return $this->render('directeur_commercial/evaluation.html.twig');
+        return $this->render('directeur_commercial/evaluation.html.twig', [
+            'controller_name' => 'DirecteurCommercialController',
+        ]);
     }
 }
